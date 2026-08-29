@@ -94,6 +94,16 @@
   .stable-actions { display: flex; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 300px; }
   .btn-secondary { background: transparent; border: 1px solid rgba(255,255,255,0.18); color: var(--white-dim); padding: 0.85rem 1.5rem; border-radius: 50px; font-size: 0.9rem; cursor: pointer; font-family: inherit; transition: all 0.25s ease; }
   .btn-secondary:active { background: rgba(255,255,255,0.05); transform: scale(0.97); }
+
+  /* DISCLAIMER SCREEN */
+  #screen-disclaimer { gap: 1.25rem; }
+  .disclaimer-title { font-size: 1.2rem; font-weight: 400; color: var(--warm); text-align: center; letter-spacing: 0.05em; }
+  .disclaimer-body { font-size: 0.9rem; color: var(--white-dim); text-align: center; line-height: 1.8; max-width: 300px; }
+  .disclaimer-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 1.1rem 1.25rem; max-width: 310px; }
+  .disclaimer-card p { font-size: 0.82rem; color: var(--white-dim); line-height: 1.7; text-align: center; }
+  .disclaimer-card a { color: var(--crisis); }
+  .disclaimer-note { font-size: 0.75rem; color: var(--white-mute); text-align: center; max-width: 280px; line-height: 1.5; }
+
 </style>
 </head>
 <body>
@@ -107,8 +117,32 @@
     </div>
   </div>
 
+
+  <!-- DISCLAIMER -->
+  <div class="screen" id="screen-disclaimer">
+    <div class="anchor-icon" style="margin-bottom:0.5rem">
+      <svg width="44" height="44" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="36" cy="18" r="8" stroke="#e8c97e" stroke-width="1.5" fill="none"/>
+        <line x1="36" y1="26" x2="36" y2="56" stroke="#e8c97e" stroke-width="1.5"/>
+        <path d="M20 40 C20 55 52 55 52 40" stroke="#e8c97e" stroke-width="1.5" fill="none"/>
+        <line x1="20" y1="40" x2="14" y2="46" stroke="#e8c97e" stroke-width="1.5"/>
+        <line x1="52" y1="40" x2="58" y2="46" stroke="#e8c97e" stroke-width="1.5"/>
+        <circle cx="36" cy="18" r="3" fill="#e8c97e"/>
+      </svg>
+    </div>
+    <h2 class="disclaimer-title">Before we begin</h2>
+    <p class="disclaimer-body">Anchor is here to support you — but there are a few things we want you to know.</p>
+    <div class="disclaimer-card">
+      <p>Anchor is a supportive companion, not a substitute for professional medical or psychological care. It is not a crisis service.<br><br>
+      If you are in immediate danger, please call emergency services or reach SADAG 24/7 on <a href="tel:0800567567">0800 567 567</a>.<br><br>
+      By continuing you acknowledge that Anchor is a peer support tool and not professional treatment.</p>
+    </div>
+    <button class="btn-primary" onclick="acceptDisclaimer()">I understand</button>
+    <p class="disclaimer-note">This message only appears once.</p>
+  </div>
+
   <!-- WELCOME -->
-  <div class="screen active" id="screen-welcome">
+  <div class="screen" id="screen-welcome">
     <div class="anchor-icon">
       <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="36" cy="18" r="8" stroke="#e8c97e" stroke-width="1.5" fill="none"/>
@@ -408,7 +442,20 @@ function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault
 function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
 function resetApp() { currentMood = ''; conversationHistory = []; crisisShown = false; document.getElementById('crisis-banner').style.display = 'none'; showScreen('welcome'); }
 
+
+function acceptDisclaimer() {
+  localStorage.setItem('anchor_disclaimer', 'accepted');
+  showScreen('welcome');
+}
+
+function checkDisclaimer() {
+  if (!localStorage.getItem('anchor_disclaimer')) {
+    showScreen('disclaimer');
+  }
+}
+
 createStars();
+checkDisclaimer();
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
