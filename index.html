@@ -793,16 +793,28 @@ function getBestVoice(){
 
 function speak(text, onend){
   if(!voiceOn){ if(onend) onend(); return; }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  const v = getBestVoice();
-  if(v) u.voice = v;
-  u.rate = 0.82;
-  u.pitch = 0.96;
-  u.volume = 1;
-  if(onend) u.onend = onend;
-  // Unlock on first user gesture — speaks cleanly on Android/iOS
-  speechSynthesis.speak(u);
+  if(!text || !text.trim()) { if(onend) onend(); return; }
+  try {
+    speechSynthesis.cancel();
+    // Android Chrome pauses speechSynthesis after ~30s — resume it
+    if(speechSynthesis.paused) speechSynthesis.resume();
+    const u = new SpeechSynthesisUtterance(text);
+    const v = getBestVoice();
+    if(v) u.voice = v;
+    u.rate = 0.82;
+    u.pitch = 0.96;
+    u.volume = 1;
+    if(onend) u.onend = onend;
+    speechSynthesis.speak(u);
+    // Android keepalive: Chrome kills synthesis after ~15s of silence — ping it
+    const keepalive = setInterval(() => {
+      if(!speechSynthesis.speaking){ clearInterval(keepalive); return; }
+      speechSynthesis.pause();
+      speechSynthesis.resume();
+    }, 10000);
+    u.onend = () => { clearInterval(keepalive); if(onend) onend(); };
+    u.onerror = () => { clearInterval(keepalive); if(onend) onend(); };
+  } catch(e) { if(onend) onend(); }
 }
 
 /* ══════════════════════════════════════
@@ -814,9 +826,16 @@ function toggleDiscAgree(){
   btn.classList.toggle('active', chk.checked);
 }
 function enterApp(){
-  // Unlock speech on first gesture
-  const u = new SpeechSynthesisUtterance('');
-  speechSynthesis.speak(u);
+  // Android Chrome requires speech triggered directly inside a user gesture
+  // with real text — empty string is silently ignored
+  if('speechSynthesis' in window){
+    speechSynthesis.cancel();
+    const unlock = new SpeechSynthesisUtterance(' ');
+    unlock.volume = 0.01; // near-silent but valid
+    const v = getBestVoice();
+    if(v) unlock.voice = v;
+    speechSynthesis.speak(unlock);
+  }
   showScreen('home');
 }
 
@@ -894,13 +913,22 @@ function startBW(idx){
   orb.classList.remove('breathing');
   orb.style.transform = 'scale(1)';
 
-  // Short intro then first phase
-  speak("Find a comfortable position. Let's begin.", () => {
-    setTimeout(() => { if(bwRunning) runPhase(); }, 600);
-  });
+  // Re-unlock speech inside this tap gesture (Android Chrome requires it per-context)
+  speechSynthesis.cancel();
 
-  // Fallback if speech doesn't fire onend (some browsers skip it)
-  setTimeout(() => { if(bwRunning && phaseNum === 0 && cycleNum === 0) runPhase(); }, 3500);
+  // Small delay lets cancel() flush, then speak intro directly in gesture stack
+  setTimeout(() => {
+    const intro = new SpeechSynthesisUtterance("Find a comfortable position. Let's begin.");
+    const v = getBestVoice();
+    if(v) intro.voice = v;
+    intro.rate = 0.82;
+    intro.pitch = 0.96;
+    intro.volume = 1;
+    intro.onend = () => { setTimeout(() => { if(bwRunning) runPhase(); }, 400); };
+    speechSynthesis.speak(intro);
+    // Fallback: if onend never fires (common on Android), start after 4s
+    setTimeout(() => { if(bwRunning && phaseNum === 0 && cycleNum === 0) runPhase(); }, 4000);
+  }, 80);
 }
 
 function runPhase(){
@@ -1038,6 +1066,8 @@ Never:
 You are not a therapist. You are Anchor — and you hold them steady until the storm passes.`;
 
 function goToChat(mood){
+  // Re-unlock speech synthesis inside this tap gesture
+  if('speechSynthesis' in window){ speechSynthesis.cancel(); }
   chatMood = mood;
   document.getElementById('moodTag').textContent = mood;
   document.getElementById('messages').innerHTML = '';
