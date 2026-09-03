@@ -581,8 +581,8 @@ html,body{
 <div class="screen hidden" id="home">
   <div class="anchor-icon">⚓</div>
   <h1 class="home-title">Anchor</h1>
-  <p class="home-tagline">you're not alone</p>
-  <p class="home-prompt">What's going on right now?</p>
+  <p class="home-tagline">ride the wave</p>
+  <p class="home-prompt">What's happening right now?</p>
   <div class="emotions">
     <button class="emotion-btn" onclick="goToChat('overwhelmed')"><span class="emotion-icon">🌊</span>Overwhelmed</button>
     <button class="emotion-btn" onclick="goToChat('craving')"><span class="emotion-icon">🔥</span>Craving</button>
@@ -644,7 +644,7 @@ html,body{
 <!-- ── COMPLETE ── -->
 <div class="screen hidden" id="complete">
   <div class="complete-star">✦</div>
-  <div class="complete-title">Done</div>
+  <div class="complete-title">Well done</div>
   <div class="complete-msg" id="completeMsg"></div>
   <button class="btn-primary" onclick="showScreen('home')">Return to Anchor</button>
   <button class="btn-primary" onclick="goToChat('overwhelmed')" style="border-color:var(--text-dim);color:var(--text-dim);margin-top:0">Talk to Anchor →</button>
@@ -658,7 +658,7 @@ const TECHNIQUES = [
   {
     name:"Box Breathing",
     meta:"4 · 4 · 4 · 4  —  nervous system reset",
-    desc:"Equal phases. Slows your breathing and calms your nervous system.",
+    desc:"Equal phases used by first responders and athletes to restore calm under pressure.",
     cycles:6,
     phases:[
       {label:"Inhale",     cue:"Breathe in",       dur:4, scale:1.38, ease:"ease-in"},
@@ -670,7 +670,7 @@ const TECHNIQUES = [
   {
     name:"4-7-8",
     meta:"4 · 7 · 8  —  deep relaxation",
-    desc:"Long exhale brings calm quickly. Good for anxiety or before sleep.",
+    desc:"Extended exhale activates the parasympathetic system. Fast-acting calm.",
     cycles:4,
     phases:[
       {label:"Inhale",     cue:"Breathe in",        dur:4, scale:1.38, ease:"ease-in"},
@@ -681,7 +681,7 @@ const TECHNIQUES = [
   {
     name:"Coherent Breathing",
     meta:"5 · 5  —  heart rate balance",
-    desc:"Slow, even breathing. Good for general stress or winding down.",
+    desc:"Syncs heart rate variability. Gentle, steady rhythm for sustained calm.",
     cycles:8,
     phases:[
       {label:"Inhale",     cue:"Breathe in",        dur:5, scale:1.32, ease:"ease-in-out"},
@@ -691,7 +691,7 @@ const TECHNIQUES = [
   {
     name:"Physiological Sigh",
     meta:"double inhale · long exhale  —  instant calm",
-    desc:"Double inhale through the nose, long exhale through the mouth. Fast reset.",
+    desc:"The fastest stress reset. A double nasal inhale followed by one long mouth exhale.",
     cycles:5,
     phases:[
       {label:"Inhale",        cue:"Breathe in",           dur:2,   scale:1.22, ease:"ease-in"},
@@ -702,7 +702,7 @@ const TECHNIQUES = [
   {
     name:"Extended Exhale",
     meta:"4 · 8  —  anxiety release",
-    desc:"Inhale for 4, exhale for 8. Reduces anxiety and settles the body.",
+    desc:"Double exhale triggers vagus nerve response. Signals safety to the brain.",
     cycles:6,
     phases:[
       {label:"Inhale",     cue:"Breathe in",        dur:4, scale:1.35, ease:"ease-in"},
@@ -712,7 +712,7 @@ const TECHNIQUES = [
   {
     name:"Triangle Breathing",
     meta:"4 · 4 · 4  —  steady focus",
-    desc:"Three equal phases. Good for focus and grounding.",
+    desc:"Three equal phases build concentration. Good before difficult moments.",
     cycles:6,
     phases:[
       {label:"Inhale",     cue:"Breathe in",        dur:4, scale:1.38, ease:"ease-in"},
@@ -723,7 +723,7 @@ const TECHNIQUES = [
   {
     name:"Diaphragmatic",
     meta:"4 · 6  —  belly breathing",
-    desc:"Slow, deep belly breathing. Reduces tension and settles the mind.",
+    desc:"Slow belly breaths reduce cortisol and ground you in the body.",
     cycles:8,
     phases:[
       {label:"Inhale",     cue:"Breathe in deeply", dur:4, scale:1.32, ease:"ease-in"},
@@ -733,7 +733,7 @@ const TECHNIQUES = [
   {
     name:"Energising Breath",
     meta:"6 · 2  —  alertness",
-    desc:"Longer inhale, short exhale. Use when you need to feel more alert.",
+    desc:"Longer inhale increases oxygen. Sharpens focus without stimulants.",
     cycles:8,
     phases:[
       {label:"Inhale",     cue:"Long breath in",    dur:6, scale:1.38, ease:"ease-in"},
@@ -895,7 +895,7 @@ function startBW(idx){
   orb.style.transform = 'scale(1)';
 
   // Short intro then first phase
-  speak("Get comfortable. We'll begin now.", () => {
+  speak("Find a comfortable position. Let's begin.", () => {
     setTimeout(() => { if(bwRunning) runPhase(); }, 600);
   });
 
@@ -984,12 +984,12 @@ function finishBW(){
   document.getElementById('phaseLabel').textContent = 'Complete';
   document.getElementById('phaseCounter').textContent = '';
 
-  speak("Session complete.");
+  speak("Session complete. Well done.");
 
   const msgs = [
-    `${activeTech.cycles} cycles of ${activeTech.name} done.`,
-    `Session complete. Take a moment before you move.`,
-    `Done. How do you feel?`
+    `${activeTech.cycles} rounds of ${activeTech.name} complete. Your nervous system thanks you.`,
+    `Beautifully done. Sit with this stillness for a moment.`,
+    `${activeTech.cycles} cycles complete. Carry this calm into what comes next.`
   ];
   document.getElementById('completeMsg').textContent = msgs[Math.floor(Math.random()*msgs.length)];
   setTimeout(() => showScreen('complete'), 1800);
@@ -1017,13 +1017,25 @@ function toggleVoice(){
 /* ══════════════════════════════════════
    CHAT
 ══════════════════════════════════════ */
-const SYSTEM_PROMPT = `You are Anchor — a support companion for people in recovery or distress. You help people through cravings, panic, loneliness, sleeplessness, and overwhelm.
+const SYSTEM_PROMPT = `You are Anchor — a warm, calm companion for people in recovery or distress. You exist for dark moments: panic, cravings, shame spirals, loneliness, sleeplessness.
 
-Tone: calm, plain, honest. No jargon. No clichés. Short responses. Don't lecture or give unsolicited advice. Don't minimise what they're feeling. Listen first.
+Your voice: gentle, grounded, human. Never clinical. Never preachy. No jargon. Short paragraphs. Speak the way a wise, caring friend would at 3am — someone who's been through hard things themselves and knows how to hold space without fixing.
 
-If someone seems in danger, offer the SADAG helpline: 0800 567 567 — free, 24 hours.
+Core philosophy: ride the wave. You don't fight the storm, you hold steady until it passes. Cravings, panic, shame — they peak and pass. You help people anchor through it.
 
-You are not a therapist. Keep it simple and human.`;
+Always:
+- Meet them exactly where they are. Don't minimise or catastrophise.
+- Use their words back to them. Reflect before offering anything.
+- One small step at a time. Never overwhelm.
+- If they seem in genuine danger, gently offer the SADAG helpline: 0800 567 567 — free, 24 hours.
+
+Never:
+- Diagnose or label.
+- Tell them what they "should" do.
+- Launch into advice without first acknowledging how they feel.
+- Be chipper or upbeat when they're suffering.
+
+You are not a therapist. You are Anchor — and you hold them steady until the storm passes.`;
 
 function goToChat(mood){
   chatMood = mood;
@@ -1032,12 +1044,12 @@ function goToChat(mood){
   showScreen('chat');
 
   const openers = {
-    overwhelmed: "I'm here. What's going on?",
-    craving: "I'm here. Tell me what's happening.",
-    lonely: "I'm here. What does tonight feel like?",
-    panic: "I'm here. You're safe right now. Can you feel your feet on the floor?",
-    "can't sleep": "I'm here. What's keeping you awake?",
-    ashamed: "I'm here. What happened?"
+    overwhelmed: "I'm here. Overwhelmed can feel like everything is crashing in at once. Take a breath — you don't have to handle it all right now. What's the biggest thing pressing on you?",
+    craving: "I hear you. Cravings are intense — they're meant to be. But they peak and pass, like a wave. You've ridden waves before. What's going on right now?",
+    lonely: "Lonely at this hour is one of the hardest feelings. I'm glad you came here. You don't have to be alone with it right now. What does tonight feel like?",
+    panic: "Okay. I'm here. You're safe in this moment. Let's slow this down together. Can you feel your feet on the floor right now?",
+    "can't sleep": "Lying awake alone with your thoughts is exhausting. You did the right thing reaching out. What's keeping you up — is it thoughts, or something in your body?",
+    ashamed: "Shame is one of the heaviest things to carry alone. I want you to know — you reaching out right now takes courage. What happened?"
   };
 
   const msg = openers[mood] || "I'm here. Tell me what's going on.";
